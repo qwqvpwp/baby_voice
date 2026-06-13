@@ -5,6 +5,9 @@ const app = getApp();
 const api = require('../../utils/api');
 const storage = require('../../utils/storage');
 
+// 录音管理器
+const recorderManager = wx.getRecorderManager();
+
 Page({
   data: {
     isRecording: false,
@@ -20,6 +23,34 @@ Page({
     suggestion: '',
     modelLabel: '',
     errorMsg: ''
+  },
+
+  onLoad() {
+    // 监听录音结束
+    recorderManager.onStop((res) => {
+      this.setData({
+        recordFilePath: res.tempFilePath,
+        hasRecorded: true,
+        isRecording: false
+      });
+      if (this.data.recordTimer) {
+        clearInterval(this.data.recordTimer);
+        this.data.recordTimer = null;
+      }
+      // 录音成功后自动分析
+      this.analyze();
+    });
+
+    recorderManager.onError((err) => {
+      if (this.data.recordTimer) {
+        clearInterval(this.data.recordTimer);
+        this.data.recordTimer = null;
+      }
+      this.setData({
+        isRecording: false,
+        errorMsg: '录音失败：' + (err.errMsg || '请授权麦克风权限')
+      });
+    });
   },
 
   onShow() {
@@ -58,22 +89,12 @@ Page({
     this.data.recordTimer = timer;
 
     // 启动录音
-    wx.startRecord({
-      success(res) {
-        that.setData({
-          recordFilePath: res.tempFilePath,
-          hasRecorded: true
-        });
-        // 录音成功后自动分析
-        that.analyze();
-      },
-      fail(err) {
-        clearInterval(that.data.recordTimer);
-        that.setData({
-          isRecording: false,
-          errorMsg: '录音失败：' + (err.errMsg || '请授权麦克风权限')
-        });
-      }
+    recorderManager.start({
+      format: 'wav',
+      sampleRate: 16000,
+      numberOfChannels: 1,
+      encodeBitRate: 96000,
+      duration: 10000
     });
   },
 
@@ -84,7 +105,7 @@ Page({
       this.data.recordTimer = null;
     }
     this.setData({ isRecording: false });
-    wx.stopRecord();
+    recorderManager.stop();
   },
 
   // 重新录制
@@ -95,6 +116,56 @@ Page({
       recordFilePath: '',
       recordingTime: 0,
       errorMsg: ''
+    });
+  },
+
+  // 从微信聊天选择音频文件
+  chooseFromChat() {
+    const that = this;
+    wx.chooseMessageFile({
+      count: 1,
+      type: 'file',
+      extension: ['wav', 'mp3', 'm4a', 'aac', 'ogg', 'flac', 'silk'],
+      success(res) {
+        const file = res.tempFiles[0];
+        that.setData({
+          recordFilePath: file.path,
+          hasRecorded: true,
+          errorMsg: '',
+          result: null
+        });
+        that.analyze();
+      },
+      fail(err) {
+        if (err.errMsg && err.errMsg.indexOf('cancel') === -1) {
+          that.setData({ errorMsg: '选择文件失败' });
+        }
+      }
+    });
+  },
+
+  // 从本地选择音频文件
+  chooseFromFile() {
+    const that = this;
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['video'],
+      sourceType: ['album'],
+      maxDuration: 30,
+      success(res) {
+        const file = res.tempFiles[0];
+        that.setData({
+          recordFilePath: file.tempFilePath,
+          hasRecorded: true,
+          errorMsg: '',
+          result: null
+        });
+        that.analyze();
+      },
+      fail(err) {
+        // chooseMedia 不支持纯音频，回退到 chooseMessageFile
+        that.chooseFromChat();
+      }
     });
   },
 
@@ -168,65 +239,7 @@ Page({
         errorMsg: err.message || '识别失败',
         isAnalyzing: false
       });
-
-      // 后端不通时的本地模拟数据（用于演示）
-      if (err.message.includes('连接失败')) {
-        that.mockAnalyze();
-      }
     });
-  },
-
-  // 本地模拟分析（后端不可用时使用）
-  mockAnalyze() {
-    const that = this;
-    const emotions = ['hug', 'hungry', 'sleepy', 'awake', 'diaper', 'uncomfortable', 'silence'];
-    const randomIdx = Math.floor(Math.random() * emotions.length);
-    const emotion = emotions[randomIdx];
-
-    const probabilities = emotions.map((e, i) => {
-      const isMain = i === randomIdx;
-      return {
-        class: e,
-        cn: app.getLabelCN(e),
-        probability: isMain ? 0.45 + Math.random() * 0.3 : Math.random() * 0.2
-      };
-    });
-    // 归一化
-    const sum = probabilities.reduce((s, p) => s + p.probability, 0);
-    probabilities.forEach(p => p.probability = p.probability / sum);
-    probabilities.sort((a, b) => b.probability - a.probability);
-
-    // 添加预计算字段
-    const maxProb = probabilities[0].probability;
-    probabilities.forEach(p => {
-      p.cn = app.getLabelCN(p.class);
-      p.isMax = p.probability === maxProb && maxProb > 0;
-      p.barWidth = (p.probability * 100).toFixed(1);
-      p.barColor = p.isMax ? 'linear-gradient(90deg, #FF6B81, #FF8E9E)' : '#E0E0E0';
-      p.probPercent = (p.probability * 100).toFixed(1);
-    });
-
-    const result = {
-      emotion: emotion,
-      emo_cn: app.getLabelCN(emotion),
-      emoji: app.getEmoji(emotion),
-      confidence: probabilities[0].probability,
-      probabilities: probabilities,
-      model_used: app.getModel()
-    };
-
-    that.setData({
-      result: result,
-      resultEmotion: result.emo_cn,
-      resultEmoji: result.emoji,
-      resultConfidence: (result.confidence * 100).toFixed(1),
-      suggestion: app.getSuggestion(emotion),
-      modelLabel: '本地模拟',
-      isAnalyzing: false,
-      errorMsg: ''
-    });
-
-    storage.addRecord(result);
   },
 
   getLabelCN(en) {

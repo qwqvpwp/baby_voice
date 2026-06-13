@@ -24,6 +24,25 @@
             bindtap="reRecord" size="mini">
       重新录制
     </button>
+
+    <!-- 上传音频入口 -->
+    <view wx:if="{{!isRecording && !hasRecorded}}" class="upload-section">
+      <view class="upload-divider">
+        <view class="divider-line"></view>
+        <text class="divider-text">或</text>
+        <view class="divider-line"></view>
+      </view>
+      <view class="upload-btns">
+        <view class="upload-btn" bindtap="chooseFromChat">
+          <text class="upload-icon">📎</text>
+          <text class="upload-label">从聊天记录选择</text>
+        </view>
+        <view class="upload-btn" bindtap="chooseFromFile">
+          <text class="upload-icon">📁</text>
+          <text class="upload-label">从本地文件选择</text>
+        </view>
+      </view>
+    </view>
   </view>
 
   <!-- 分析中提示 -->

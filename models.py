@@ -59,23 +59,10 @@ def cnn_lstm_model(input_shape=(40, 128, 1), num_classes=7):
 
 class PositionalEncoding(layers.Layer):
     """位置编码层"""
-    def __init__(self, d_model, max_len=200):
-        super().__init__()
+    def __init__(self, d_model, max_len=200, **kwargs):
+        super().__init__(**kwargs)
         self.d_model = d_model
         self.max_len = max_len
-
-    def build(self, input_shape):
-        position = tf.range(self.max_len, dtype=tf.float32)[:, tf.newaxis]
-        div_term = tf.exp(tf.range(0, self.d_model, 2, dtype=tf.float32) *
-                          -(tf.math.log(10000.0) / self.d_model))
-        pe = tf.Variable(tf.zeros((self.max_len, self.d_model)), trainable=False)
-        pe_updated = tf.tensor_scatter_nd_update(
-            pe,
-            tf.stack([tf.range(self.max_len), tf.repeat(0, self.max_len)], axis=1),
-            tf.sin(position[:, 0] * div_term[0:1])
-        )
-        self.pe = pe
-        super().build(input_shape)
 
     def call(self, x):
         # x: (batch, seq_len, d_model)

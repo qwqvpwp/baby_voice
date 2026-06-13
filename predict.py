@@ -10,6 +10,9 @@ import numpy as np
 import librosa
 import tensorflow as tf
 
+# 导入自定义层
+from models import PositionalEncoding
+
 
 # ============ 配置 ============
 PROCESSED_DIR = "processed_data"
@@ -43,12 +46,30 @@ class EmotionPredictor:
             "cnn_lstm": os.path.join(MODELS_DIR, "cnn_lstm_final.h5"),
             "transformer": os.path.join(MODELS_DIR, "transformer_final.h5"),
         }
+        custom_objects = {"PositionalEncoding": PositionalEncoding}
+
         for name, path in model_files.items():
-            if os.path.exists(path):
-                self.models[name] = tf.keras.models.load_model(path)
-                print(f"  已加载模型: {name}")
-            else:
+            if not os.path.exists(path):
                 print(f"  模型未找到: {name} ({path})")
+                continue
+            try:
+                self.models[name] = tf.keras.models.load_model(path, custom_objects=custom_objects)
+                print(f"  已加载模型: {name}")
+            except Exception as e:
+                print(f"  直接加载失败 {name}: {e}")
+                try:
+                    # 从保存的配置重建模型结构，再加载权重
+                    import h5py
+                    with h5py.File(path, "r") as f:
+                        config = json.loads(f.attrs["model_config"])
+                    model = tf.keras.models.model_from_json(
+                        json.dumps(config), custom_objects=custom_objects
+                    )
+                    model.load_weights(path)
+                    self.models[name] = model
+                    print(f"  已加载模型 (从配置重建): {name}")
+                except Exception as e2:
+                    print(f"  加载模型失败 {name}: {e2}")
 
     def extract_features(self, audio_data, sr=SAMPLE_RATE):
         """从音频数据提取 MFCC 特征"""

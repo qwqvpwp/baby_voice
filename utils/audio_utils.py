@@ -8,8 +8,11 @@ import base64
 
 
 def save_audio_file(audio_file):
-    suffix = ".wav" if audio_file.filename.endswith(".wav") else ".mp3"
-    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+    filename = audio_file.filename or "audio.wav"
+    _, ext = os.path.splitext(filename)
+    if not ext:
+        ext = ".wav"
+    with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
         audio_file.save(tmp.name)
         return tmp.name
 
