@@ -1,0 +1,33 @@
+/* 主页面样式 */
+.title-section {
+  text-align: center;
+  padding: 40rpx 0 20rpx;
+}
+.title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #FF6B81;
+  display: block;
+}
+.subtitle {
+  font-size: 26rpx;
+  color: #BBB;
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* 动画点 */
+.dot {
+  font-size: 36rpx;
+  color: #FF6B81;
+  margin: 0 8rpx;
+  animation: blink 1.4s infinite;
+  display: inline-block;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.2; }
+  40% { opacity: 1; }
+}

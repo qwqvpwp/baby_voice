@@ -1,0 +1,117 @@
+/* 设置页样式 */
+.section-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+  display: block;
+}
+.section-desc {
+  font-size: 24rpx;
+  color: #BBB;
+  display: block;
+  margin-top: 4rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 模型选择列表 */
+.model-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+.model-item:last-child {
+  border-bottom: none;
+}
+.model-item.active {
+  background: #FFF0F3;
+  margin: 0 -20rpx;
+  padding-left: 20rpx;
+  padding-right: 20rpx;
+  border-radius: 12rpx;
+}
+.model-radio {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #DDD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.model-item.active .model-radio {
+  border-color: #FF6B81;
+}
+.radio-dot {
+  width: 22rpx;
+  height: 22rpx;
+  border-radius: 50%;
+  background: #FF6B81;
+}
+.model-content {
+  flex: 1;
+}
+.model-name {
+  font-size: 30rpx;
+  color: #333;
+  display: block;
+}
+.model-desc {
+  font-size: 24rpx;
+  color: #999;
+  display: block;
+  margin-top: 4rpx;
+}
+
+/* API 配置 */
+.api-config {
+  margin-top: 20rpx;
+}
+.config-label {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-top: 20rpx;
+  margin-bottom: 10rpx;
+}
+.config-input {
+  background: #F8F8F8;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+.key-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.key-hint {
+  font-size: 22rpx;
+  color: #CCC;
+  display: block;
+  margin-top: 8rpx;
+}
+.btn-small {
+  background: #FF6B81;
+  color: #FFF;
+  border: none;
+  border-radius: 8rpx;
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
+  flex-shrink: 0;
+}
+
+/* 关于信息 */
+.about-info {
+  margin-top: 16rpx;
+}
+.about-item {
+  font-size: 26rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 8rpx;
+}

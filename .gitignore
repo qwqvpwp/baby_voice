@@ -1,0 +1,7 @@
+data/
+models_output/
+processed_data/
+__pycache__/
+.idea/
+*.log
+tmp_*.txt

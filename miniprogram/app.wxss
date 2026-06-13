@@ -1,0 +1,220 @@
+/* 全局样式 */
+page {
+  background-color: #FFF5F5;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  min-height: 100vh;
+}
+
+.container {
+  padding: 20rpx;
+}
+
+/* 卡片 */
+.card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.08);
+}
+
+/* 按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  padding: 24rpx 60rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 129, 0.35);
+}
+
+.btn-secondary {
+  background: #FFFFFF;
+  color: #FF6B81;
+  border: 2rpx solid #FF6B81;
+  border-radius: 48rpx;
+  font-size: 28rpx;
+  padding: 20rpx 40rpx;
+}
+
+/* 录音按钮 */
+.record-btn {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12rpx 32rpx rgba(255, 107, 129, 0.4);
+  transition: transform 0.15s ease;
+}
+.record-btn:active {
+  transform: scale(0.92);
+}
+.record-btn.recording {
+  background: linear-gradient(135deg, #FF4444, #FF6B6B);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 12rpx 32rpx rgba(255, 68, 68, 0.4); }
+  50% { box-shadow: 0 12rpx 48rpx rgba(255, 68, 68, 0.7); }
+}
+
+/* 录音图标 */
+.record-icon {
+  width: 64rpx;
+  height: 64rpx;
+  background: #FFFFFF;
+  border-radius: 8rpx;
+}
+
+/* 概率条 */
+.prob-bar {
+  display: flex;
+  align-items: center;
+  margin: 12rpx 0;
+}
+.prob-label {
+  width: 120rpx;
+  font-size: 26rpx;
+  color: #666;
+  text-align: right;
+  margin-right: 16rpx;
+}
+.prob-track {
+  flex: 1;
+  height: 28rpx;
+  background: #F5F5F5;
+  border-radius: 14rpx;
+  overflow: hidden;
+}
+.prob-fill {
+  height: 100%;
+  border-radius: 14rpx;
+  transition: width 0.6s ease;
+}
+
+/* 情绪主结果 */
+.emotion-hero {
+  text-align: center;
+  padding: 40rpx 0;
+}
+.emotion-emoji {
+  font-size: 96rpx;
+}
+.emotion-name {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #FF6B81;
+  margin: 12rpx 0;
+}
+.emotion-confidence {
+  font-size: 28rpx;
+  color: #999;
+}
+.emotion-suggestion {
+  background: #FFF0F2;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 模型标签 */
+.model-tag {
+  display: inline-block;
+  background: #FF6B81;
+  color: #FFFFFF;
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  margin-top: 16rpx;
+}
+
+/* 历史列表 */
+.history-item {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+.history-emoji {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+.history-info {
+  flex: 1;
+}
+.history-emotion {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+.history-time {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+.history-conf {
+  font-size: 26rpx;
+  color: #FF6B81;
+}
+.history-del {
+  padding: 10rpx 20rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 设置页 */
+.settings-section {
+  margin-bottom: 30rpx;
+}
+.settings-title {
+  font-size: 28rpx;
+  color: #999;
+  padding: 0 10rpx 16rpx;
+}
+.settings-item {
+  background: #FFFFFF;
+  padding: 28rpx 30rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.settings-item:first-child {
+  border-radius: 16rpx 16rpx 0 0;
+}
+.settings-item:last-child {
+  border-radius: 0 0 16rpx 16rpx;
+  border-bottom: none;
+}
+.settings-label {
+  font-size: 30rpx;
+  color: #333;
+}
+.settings-value {
+  font-size: 26rpx;
+  color: #999;
+}
+.settings-arrow {
+  font-size: 24rpx;
+  color: #CCC;
+  margin-left: 12rpx;
+}
+
+/* 提示 */
+.tip-text {
+  font-size: 24rpx;
+  color: #CCC;
+  text-align: center;
+  padding: 30rpx;
+}

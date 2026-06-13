@@ -1,0 +1,85 @@
+<!-- 设置页面 -->
+<view class="container">
+  <!-- 模型选择 -->
+  <view class="card">
+    <text class="section-title">模型选择</text>
+    <text class="section-desc">选择用于语音识别的模型</text>
+
+    <view class="model-list">
+      <view class="model-item {{currentModel === 'cnn_lstm' ? 'active' : ''}}" 
+            bindtap="switchModel" data-model="cnn_lstm">
+        <view class="model-radio">
+          <view wx:if="{{currentModel === 'cnn_lstm'}}" class="radio-dot"></view>
+        </view>
+        <view class="model-content">
+          <text class="model-name">CNN-LSTM 混合模型</text>
+          <text class="model-desc">卷积 + 时序网络，适合实时推理</text>
+        </view>
+      </view>
+
+      <view class="model-item {{currentModel === 'transformer' ? 'active' : ''}}" 
+            bindtap="switchModel" data-model="transformer">
+        <view class="model-radio">
+          <view wx:if="{{currentModel === 'transformer'}}" class="radio-dot"></view>
+        </view>
+        <view class="model-content">
+          <text class="model-name">Transformer 模型</text>
+          <text class="model-desc">自注意力机制，精度更高</text>
+        </view>
+      </view>
+
+      <view class="model-item {{currentModel === 'api' ? 'active' : ''}}" 
+            bindtap="switchModel" data-model="api">
+        <view class="model-radio">
+          <view wx:if="{{currentModel === 'api'}}" class="radio-dot"></view>
+        </view>
+        <view class="model-content">
+          <text class="model-name">外部 API</text>
+          <text class="model-desc">调用第三方语音识别服务</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- API 配置（仅在选择 api 时显示） -->
+  <view wx:if="{{currentModel === 'api'}}" class="card">
+    <text class="section-title">API 配置</text>
+    <view class="api-config">
+      <text class="config-label">API 地址</text>
+      <input class="config-input" placeholder="https://api.example.com/predict" 
+             value="{{apiUrl}}" bindinput="onApiUrlChange"/>
+      
+      <text class="config-label">API Key</text>
+      <view class="key-row">
+        <input class="config-input" style="flex: 1;" 
+               placeholder="输入 API Key" password="true"
+               value="{{apiKey}}" bindinput="onApiKeyChange"/>
+        <button class="btn-small" bindtap="saveApiKey" size="mini">保存</button>
+      </view>
+      <text class="key-hint">API Key 加密存储于本地，仅本小程序可用</text>
+    </view>
+  </view>
+
+  <!-- 服务器设置 -->
+  <view class="card">
+    <text class="section-title">服务器设置</text>
+    <view class="api-config">
+      <text class="config-label">后端地址</text>
+      <input class="config-input" placeholder="http://192.168.x.x:5000" 
+             value="{{serverUrl}}" bindinput="onServerUrlChange"/>
+      <button class="btn-small" style="margin-top: 16rpx;" 
+              bindtap="saveServerUrl" size="mini">保存</button>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="card">
+    <text class="section-title">关于</text>
+    <view class="about-info">
+      <text class="about-item">版本：1.0.0</text>
+      <text class="about-item">用途：婴儿哭声情绪识别</text>
+      <text class="about-item">类别：醒了 / 换尿布 / 要抱抱 / 饿了 / 安静 / 困了 / 不舒服</text>
+      <text class="about-item">模型：CNN-LSTM / Transformer</text>
+    </view>
+  </view>
+</view>
