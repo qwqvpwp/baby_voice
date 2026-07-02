@@ -10,6 +10,7 @@ from flask_cors import CORS
 from controllers.health_controller import home, health
 from controllers.predict_controller import predict, predict_base64, info
 from controllers.secret_controller import set_secret, delete_secret
+from controllers.convert_controller import formats, convert, convert_base64
 
 app = Flask(__name__)
 CORS(app)
@@ -21,6 +22,9 @@ app.add_url_rule("/api/predict", view_func=predict, methods=["POST"])
 app.add_url_rule("/api/predict/base64", view_func=predict_base64, methods=["POST"])
 app.add_url_rule("/api/secrets", view_func=set_secret, methods=["POST"])
 app.add_url_rule("/api/secrets/<key>", view_func=delete_secret, methods=["DELETE"])
+app.add_url_rule("/api/convert/formats", view_func=formats, methods=["GET"])
+app.add_url_rule("/api/convert", view_func=convert, methods=["POST"])
+app.add_url_rule("/api/convert/base64", view_func=convert_base64, methods=["POST"])
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

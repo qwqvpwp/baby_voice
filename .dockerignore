@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.git
+.gitignore
+.idea
+.vscode
+data/
+miniprogram/
+paper/
+总结/
+plots/

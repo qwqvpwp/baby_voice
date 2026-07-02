@@ -29,7 +29,6 @@ Page({
     // 监听录音结束
     recorderManager.onStop((res) => {
       this.setData({
-        recordFilePath: res.tempFilePath,
         hasRecorded: true,
         isRecording: false
       });
@@ -37,8 +36,30 @@ Page({
         clearInterval(this.data.recordTimer);
         this.data.recordTimer = null;
       }
-      // 录音成功后自动分析
-      this.analyze();
+
+      // 验证录音
+      if (!res.tempFilePath) {
+        this.setData({ errorMsg: '录音文件无效' });
+        return;
+      }
+      if (res.duration < 500) {
+        this.setData({ errorMsg: '录音时间太短，请录制 1 秒以上' });
+        return;
+      }
+
+      // 读取录音文件为 base64（避免 wx.uploadFile 对录音临时文件兼容问题）
+      const that = this;
+      const fs = wx.getFileSystemManager();
+      fs.readFile({
+        filePath: res.tempFilePath,
+        encoding: 'base64',
+        success(fileRes) {
+          that.analyzeRecording(fileRes.data);
+        },
+        fail(err) {
+          that.setData({ errorMsg: '读取录音失败: ' + (err.errMsg || '未知错误') });
+        }
+      });
     });
 
     recorderManager.onError((err) => {
@@ -93,7 +114,6 @@ Page({
       format: 'wav',
       sampleRate: 16000,
       numberOfChannels: 1,
-      encodeBitRate: 96000,
       duration: 10000
     });
   },
@@ -125,7 +145,7 @@ Page({
     wx.chooseMessageFile({
       count: 1,
       type: 'file',
-      extension: ['wav', 'mp3', 'm4a', 'aac', 'ogg', 'flac', 'silk'],
+      extension: ['wav'],
       success(res) {
         const file = res.tempFiles[0];
         that.setData({
@@ -169,7 +189,24 @@ Page({
     });
   },
 
-  // 分析录音
+  // 分析录音（base64 方式）
+  analyzeRecording(audioBase64) {
+    const that = this;
+    this.setData({ isAnalyzing: true, errorMsg: '' });
+
+    const model = app.getModel();
+
+    api.predictBase64(audioBase64, model).then(res => {
+      that.processResult(res, model);
+    }).catch(err => {
+      that.setData({
+        errorMsg: err.message || '识别失败',
+        isAnalyzing: false
+      });
+    });
+  },
+
+  // 分析文件上传
   analyze() {
     if (!this.data.recordFilePath) return;
 
@@ -181,64 +218,69 @@ Page({
     api.predict(this.data.recordFilePath, model, {
       source: model === 'api' ? 'api' : 'local'
     }).then(res => {
-      const resultEmotion = that.getLabelCN(res.emotion);
-      const resultEmoji = app.getEmoji(res.emotion);
-      const resultConfidence = (res.confidence * 100).toFixed(1);
-      const suggestion = app.getSuggestion(res.emotion);
-
-      // 处理概率列表 - 添加中文名、是否为最高概率、进度条颜色
-      const maxProb = Math.max(...(res.probabilities || []).map(p => p.probability));
-      const probabilities = (res.probabilities || []).map(p => {
-        const isMax = p.probability === maxProb && maxProb > 0;
-        return {
-          ...p,
-          cn: app.getLabelCN(p.class),
-          isMax: isMax,
-          barWidth: (p.probability * 100).toFixed(1),
-          barColor: isMax ? 'linear-gradient(90deg, #FF6B81, #FF8E9E)' : '#E0E0E0',
-          probPercent: (p.probability * 100).toFixed(1)
-        };
-      });
-
-      const modelLabels = {
-        'cnn_lstm': 'CNN-LSTM 模型',
-        'transformer': 'Transformer 模型',
-        'api': '外部API'
-      };
-
-      const resultData = {
-        emotion: res.emotion,
-        emo_cn: resultEmotion,
-        emoji: resultEmoji,
-        confidence: res.confidence,
-        probabilities: probabilities,
-        model_used: res.model_used || model
-      };
-
-      that.setData({
-        result: resultData,
-        resultEmotion: resultEmotion,
-        resultEmoji: resultEmoji,
-        resultConfidence: resultConfidence,
-        suggestion: suggestion,
-        modelLabel: modelLabels[res.model_used || model] || res.model_used,
-        isAnalyzing: false
-      });
-
-      // 保存到历史记录
-      storage.addRecord({
-        emotion: res.emotion,
-        emo_cn: resultEmotion,
-        emoji: resultEmoji,
-        confidence: res.confidence,
-        probabilities: probabilities.slice(0, 3),
-        model_used: res.model_used || model
-      });
+      that.processResult(res, model);
     }).catch(err => {
       that.setData({
         errorMsg: err.message || '识别失败',
         isAnalyzing: false
       });
+    });
+  },
+
+  // 处理预测结果（recording 和 file upload 共用）
+  processResult(res, model) {
+    const resultEmotion = this.getLabelCN(res.emotion);
+    const resultEmoji = app.getEmoji(res.emotion);
+    const resultConfidence = (res.confidence * 100).toFixed(1);
+    const suggestion = app.getSuggestion(res.emotion);
+
+    // 处理概率列表 - 添加中文名、是否为最高概率、进度条颜色
+    const maxProb = Math.max(...(res.probabilities || []).map(p => p.probability));
+    const probabilities = (res.probabilities || []).map(p => {
+      const isMax = p.probability === maxProb && maxProb > 0;
+      return {
+        ...p,
+        cn: app.getLabelCN(p.class),
+        isMax: isMax,
+        barWidth: (p.probability * 100).toFixed(1),
+        barColor: isMax ? 'linear-gradient(90deg, #FF6B81, #FF8E9E)' : '#E0E0E0',
+        probPercent: (p.probability * 100).toFixed(1)
+      };
+    });
+
+    const modelLabels = {
+      'cnn_lstm': 'CNN-LSTM 模型',
+      'transformer': 'Transformer 模型',
+      'api': '外部API'
+    };
+
+    const resultData = {
+      emotion: res.emotion,
+      emo_cn: resultEmotion,
+      emoji: resultEmoji,
+      confidence: res.confidence,
+      probabilities: probabilities,
+      model_used: res.model_used || model
+    };
+
+    this.setData({
+      result: resultData,
+      resultEmotion: resultEmotion,
+      resultEmoji: resultEmoji,
+      resultConfidence: resultConfidence,
+      suggestion: suggestion,
+      modelLabel: modelLabels[res.model_used || model] || res.model_used,
+      isAnalyzing: false
+    });
+
+    // 保存到历史记录
+    storage.addRecord({
+      emotion: res.emotion,
+      emo_cn: resultEmotion,
+      emoji: resultEmoji,
+      confidence: res.confidence,
+      probabilities: probabilities.slice(0, 3),
+      model_used: res.model_used || model
     });
   },
 

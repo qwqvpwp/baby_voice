@@ -5,3 +5,17 @@ __pycache__/
 .idea/
 *.log
 tmp_*.txt
+paper/
+*.docx
+*.caj
+*.zip
+*.pptx
+报告.md
+思路.txt
+工作总结*.txt
+总结/
+提交文件夹/
+XIANG/
+选题背景*.md
+选题背景*.docx
+论文选题*.md
