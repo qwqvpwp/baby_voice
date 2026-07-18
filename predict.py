@@ -58,18 +58,20 @@ class EmotionPredictor:
             except Exception as e:
                 print(f"  直接加载失败 {name}: {e}")
                 try:
-                    # 从保存的配置重建模型结构，再加载权重
-                    import h5py
-                    with h5py.File(path, "r") as f:
-                        config = json.loads(f.attrs["model_config"])
-                    model = tf.keras.models.model_from_json(
-                        json.dumps(config), custom_objects=custom_objects
-                    )
+                    model = self._rebuild_model_from_config(name, path)
                     model.load_weights(path)
                     self.models[name] = model
                     print(f"  已加载模型 (从配置重建): {name}")
                 except Exception as e2:
                     print(f"  加载模型失败 {name}: {e2}")
+
+    def _rebuild_model_from_config(self, name, path):
+        """从模型配置重建模型结构"""
+        from models import build_model
+        
+        model = build_model(name, input_shape=(40, 128, 1), num_classes=self.num_classes)
+        
+        return model
 
     def extract_features(self, audio_data, sr=SAMPLE_RATE):
         """从音频数据提取 MFCC 特征"""

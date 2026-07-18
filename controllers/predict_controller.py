@@ -2,7 +2,6 @@
 """
 预测控制器 - 提供音频情感识别接口
 """
-import traceback
 from flask import request, jsonify
 from services.predictor import predictor_service
 from services.secret_manager import secrets
@@ -30,7 +29,7 @@ def predict():
 
         return jsonify(result)
     except Exception as e:
-        return jsonify({"error": str(e) or repr(e), "traceback": traceback.format_exc(), "code": 500}), 500
+        return jsonify({"error": str(e) or repr(e), "code": 500}), 500
     finally:
         cleanup_temp_file(tmp_path)
 
@@ -57,6 +56,5 @@ def predict_base64():
 def info():
     return jsonify({
         "models": predictor_service.get_available_models(),
-        "labels": predictor_service.get_label_info(),
-        "secrets": secrets.list_keys()
+        "labels": predictor_service.get_label_info()
     })

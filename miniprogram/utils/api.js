@@ -24,6 +24,9 @@ function predict(filePath, model, extra = {}) {
       url: getServerUrl() + '/api/predict',
       filePath: filePath,
       name: 'audio',
+      header: {
+        'X-API-Key': app.globalData.apiKey
+      },
       formData: {
         model: model || 'cnn_lstm',
         source: extra.source || 'local',
@@ -58,6 +61,10 @@ function predictBase64(audioBase64, model) {
     wx.request({
       url: getServerUrl() + '/api/predict/base64',
       method: 'POST',
+      header: {
+        'X-API-Key': app.globalData.apiKey,
+        'Content-Type': 'application/json'
+      },
       data: {
         audio: audioBase64,
         model: model || 'cnn_lstm'
@@ -91,6 +98,9 @@ function getModelInfo() {
     wx.request({
       url: getServerUrl() + '/api/info',
       method: 'GET',
+      header: {
+        'X-API-Key': app.globalData.apiKey
+      },
       success(res) {
         if (res.statusCode === 200) {
           resolve(res.data);

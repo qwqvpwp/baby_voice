@@ -78,11 +78,14 @@
 }
 .config-input {
   background: #F8F8F8;
+  border: 1rpx solid #EEE;
   border-radius: 12rpx;
-  padding: 20rpx;
+  padding: 24rpx 20rpx;
   font-size: 28rpx;
   width: 100%;
   box-sizing: border-box;
+  min-height: 80rpx;
+  line-height: 1.5;
 }
 .key-row {
   display: flex;

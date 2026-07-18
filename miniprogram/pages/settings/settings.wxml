@@ -65,10 +65,12 @@
     <text class="section-title">服务器设置</text>
     <view class="api-config">
       <text class="config-label">后端地址</text>
-      <input class="config-input" placeholder="http://192.168.x.x:5000" 
-             value="{{serverUrl}}" bindinput="onServerUrlChange"/>
-      <button class="btn-small" style="margin-top: 16rpx;" 
-              bindtap="saveServerUrl" size="mini">保存</button>
+      <view class="key-row">
+        <input class="config-input" style="flex: 1;" 
+               placeholder="http://192.168.x.x:5000" 
+               value="{{serverUrl}}" bindinput="onServerUrlChange"/>
+        <button class="btn-small" bindtap="saveServerUrl" size="mini">保存</button>
+      </view>
     </view>
   </view>
 

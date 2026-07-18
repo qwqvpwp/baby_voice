@@ -5,6 +5,8 @@ App({
   globalData: {
     // 服务器地址（开发时填写局域网IP）
     serverUrl: 'http://10.133.18.154:5000',
+    // API Key（与服务器配置一致）
+    apiKey: 'your-secret-key',
     // 当前选择的模型
     currentModel: 'cnn_lstm',
     // 标签映射

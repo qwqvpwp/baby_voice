@@ -41,5 +41,6 @@
       "desc": "需要使用你的麦克风录制婴儿声音"
     }
   },
+  "lazyCodeLoading": "requiredComponents",
   "sitemapLocation": "sitemap.json"
 }
