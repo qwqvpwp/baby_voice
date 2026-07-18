@@ -7,7 +7,7 @@
 ## 实验流程总览
 
 ```
-① 环境准备 → ② 数据预处理 → ③ 模型训练 → ④ 模型评估 → ⑤ 推理服务 → ⑥ 小程序对接
+① 环境准备 → ② 数据预处理 → ③ 模型训练 → ④ 模型评估 → ⑤ 推理服务 → ⑥ 小程序对接 → ⑦ Docker 部署
 ```
 
 | 阶段 | 脚本 | 输入 | 输出 |
@@ -18,6 +18,7 @@
 | ④ 模型评估 | `eval_cv_short.py` / `eval_per_class.py` / `visualize_results.py` | 训练好的模型 | 准确率、混淆矩阵、可视化图表 |
 | ⑤ 推理服务 | `predict.py` / `app.py` | 模型 + 音频文件 | 预测结果 / Flask API |
 | ⑥ 小程序对接 | `miniprogram/` | Flask API 地址 | 微信小程序界面 |
+| ⑦ Docker 部署 | `Dockerfile` / `docker-compose.yml` | 项目代码 + 模型 | 容器化 API 服务 |
 
 ---
 
@@ -335,6 +336,44 @@ python app.py
 # 6. 单文件预测测试
 python predict.py XIANG/想抱抱.wav
 ```
+
+---
+
+## Docker 部署
+
+### 镜像说明
+
+由于国内网络无法直接拉取 Docker Hub 官方镜像，本项目使用华为云镜像源：
+
+| 官方镜像 | 华为云镜像源 |
+|---------|------------|
+| `python:3.9-slim` | `swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/python:3.9-slim` |
+
+Dockerfile 中的 `FROM` 已配置为华为云地址，无需额外修改。
+
+### 构建与启动
+
+```bash
+# 构建镜像
+docker compose build
+
+# 启动服务
+docker compose up -d
+
+# 查看状态
+docker compose ps
+
+# 健康检查
+curl http://localhost:5000/api/health
+```
+
+### 配置说明
+
+- **端口**: 5000（主机:容器）
+- **内存限制**: 最大 2GB，预留 1GB
+- **模型挂载**: `./models_output` → `/app/models_output`
+- **数据挂载**: `./processed_data` → `/app/processed_data`
+- **认证开关**: `REQUIRE_AUTH=false`（默认关闭）
 
 ---
 
