@@ -12,6 +12,7 @@ import tensorflow as tf
 
 # 导入自定义层
 from models import PositionalEncoding
+from utils.cloud_storage import download_json_config
 
 
 # ============ 配置 ============
@@ -21,15 +22,17 @@ SAMPLE_RATE = 16000
 N_MFCC = 40
 N_TIME_STEPS = 128
 
+LABEL_CONFIG_URL = os.environ.get("LABEL_CONFIG_URL", "")
+MODEL_CNN_LSTM_URL = os.environ.get("MODEL_CNN_LSTM_URL", "")
+MODEL_TRANSFORMER_URL = os.environ.get("MODEL_TRANSFORMER_URL", "")
+
 
 class EmotionPredictor:
     """语音情感预测器"""
 
     def __init__(self):
         # 加载标签配置
-        config_path = os.path.join(PROCESSED_DIR, "label_config.json")
-        with open(config_path, "r", encoding="utf-8") as f:
-            self.label_config = json.load(f)
+        self.label_config = self._load_label_config()
 
         self.classes = self.label_config["classes"]
         self.cn_mapping = self.label_config["mapping"]
@@ -40,26 +43,67 @@ class EmotionPredictor:
         self.models = {}
         self._load_models()
 
+    def _load_label_config(self):
+        """加载标签配置，支持从云存储下载"""
+        local_path = os.path.join(PROCESSED_DIR, "label_config.json")
+
+        if os.path.exists(local_path):
+            print(f"  使用本地配置文件: {local_path}")
+            with open(local_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+
+        if LABEL_CONFIG_URL:
+            print(f"  本地配置文件不存在，从云存储下载: {LABEL_CONFIG_URL}")
+            try:
+                return download_json_config(LABEL_CONFIG_URL)
+            except Exception as e:
+                raise RuntimeError(f"无法加载标签配置: {e}")
+
+        raise RuntimeError(
+            f"标签配置文件不存在: {local_path}，且未配置 LABEL_CONFIG_URL 环境变量"
+        )
+
     def _load_models(self):
-        """加载所有可用模型"""
-        model_files = {
-            "cnn_lstm": os.path.join(MODELS_DIR, "cnn_lstm_final.h5"),
-            "transformer": os.path.join(MODELS_DIR, "transformer_final.h5"),
-        }
+        """加载所有可用模型，支持从云存储下载"""
+        model_configs = [
+            {
+                "name": "cnn_lstm",
+                "filename": "cnn_lstm_final.h5",
+                "env_url": MODEL_CNN_LSTM_URL,
+            },
+            {
+                "name": "transformer",
+                "filename": "transformer_final.h5",
+                "env_url": MODEL_TRANSFORMER_URL,
+            },
+        ]
         custom_objects = {"PositionalEncoding": PositionalEncoding}
 
-        for name, path in model_files.items():
-            if not os.path.exists(path):
-                print(f"  模型未找到: {name} ({path})")
+        for config in model_configs:
+            name = config["name"]
+            local_path = os.path.join(MODELS_DIR, config["filename"])
+
+            if not os.path.exists(local_path) and config["env_url"]:
+                print(f"  本地模型未找到，从云存储下载: {config['env_url']}")
+                try:
+                    from utils.cloud_storage import download_model_file
+                    download_model_file(config["env_url"], MODELS_DIR, config["filename"])
+                except Exception as e:
+                    print(f"  下载模型失败 {name}: {e}")
+                    continue
+
+            if not os.path.exists(local_path):
+                print(f"  模型未找到: {name} ({local_path})")
                 continue
+
             try:
-                self.models[name] = tf.keras.models.load_model(path, custom_objects=custom_objects)
+                self.models[name] = tf.keras.models.load_model(local_path, custom_objects=custom_objects)
                 print(f"  已加载模型: {name}")
             except Exception as e:
                 print(f"  直接加载失败 {name}: {e}")
                 try:
-                    model = self._rebuild_model_from_config(name, path)
-                    model.load_weights(path)
+                    model = self._rebuild_model_from_config(name, local_path)
+                    model.load_weights(local_path)
                     self.models[name] = model
                     print(f"  已加载模型 (从配置重建): {name}")
                 except Exception as e2:

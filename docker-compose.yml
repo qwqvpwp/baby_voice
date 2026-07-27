@@ -16,6 +16,10 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
       - REQUIRE_AUTH=false
       - ALLOWED_ORIGINS=*
+      # 云存储配置（可选，用于从微信云托管对象存储下载文件）
+      # - LABEL_CONFIG_URL=https://your-storage-url/label_config.json
+      # - MODEL_CNN_LSTM_URL=https://your-storage-url/cnn_lstm_final.h5
+      # - MODEL_TRANSFORMER_URL=https://your-storage-url/transformer_final.h5
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]

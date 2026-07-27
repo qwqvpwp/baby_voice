@@ -15,7 +15,10 @@ RUN echo "deb http://mirrors.aliyun.com/debian/ trixie main non-free-firmware" >
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=5000 \
-    REQUIRE_AUTH=false
+    REQUIRE_AUTH=false \
+    LABEL_CONFIG_URL="" \
+    MODEL_CNN_LSTM_URL="" \
+    MODEL_TRANSFORMER_URL=""
 
 COPY requirements.txt .
 

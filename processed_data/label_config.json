@@ -1,0 +1,38 @@
+{
+  "classes": [
+    "awake",
+    "diaper",
+    "hug",
+    "hungry",
+    "silence",
+    "sleepy",
+    "uncomfortable"
+  ],
+  "mapping": {
+    "hug": "要抱抱",
+    "hungry": "饿了",
+    "sleepy": "困了",
+    "awake": "醒了",
+    "diaper": "换尿布",
+    "uncomfortable": "不舒服",
+    "silence": "安静"
+  },
+  "class_to_id": {
+    "awake": 0,
+    "diaper": 1,
+    "hug": 2,
+    "hungry": 3,
+    "silence": 4,
+    "sleepy": 5,
+    "uncomfortable": 6
+  },
+  "id_to_class": {
+    "0": "awake",
+    "1": "diaper",
+    "2": "hug",
+    "3": "hungry",
+    "4": "silence",
+    "5": "sleepy",
+    "6": "uncomfortable"
+  }
+}
