@@ -5,6 +5,7 @@
 import os
 import tempfile
 import base64
+import requests as http_requests
 
 
 def save_audio_file(audio_file):
@@ -23,6 +24,17 @@ def save_base64_audio(audio_b64, suffix=".wav"):
         suffix = f".{suffix}"
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
         tmp.write(audio_bytes)
+        return tmp.name
+
+
+def save_url_audio(audio_url, suffix=".wav", timeout=30):
+    """从 URL 下载音频文件并保存为临时文件"""
+    resp = http_requests.get(audio_url, timeout=timeout)
+    resp.raise_for_status()
+    if not suffix.startswith("."):
+        suffix = f".{suffix}"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(resp.content)
         return tmp.name
 
 

@@ -63,14 +63,9 @@
   <!-- 服务器设置 -->
   <view class="card">
     <text class="section-title">服务器设置</text>
-    <view class="api-config">
-      <text class="config-label">后端地址</text>
-      <view class="key-row">
-        <input class="config-input" style="flex: 1;" 
-               placeholder="http://192.168.x.x:5000" 
-               value="{{serverUrl}}" bindinput="onServerUrlChange"/>
-        <button class="btn-small" bindtap="saveServerUrl" size="mini">保存</button>
-      </view>
+    <view class="about-info">
+      <text class="about-item">连接方式：微信云托管（内网安全访问）</text>
+      <text class="about-item">无需配置服务器地址，自动内网通信</text>
     </view>
   </view>
 

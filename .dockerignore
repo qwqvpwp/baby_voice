@@ -12,8 +12,6 @@ miniprogram/
 paper/
 总结/
 plots/
-models_output/
-processed_data/
 train.py
 train_cnn_lstm.py
 train_cv.py

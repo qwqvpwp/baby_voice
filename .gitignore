@@ -1,8 +1,8 @@
 data/
-models_output/
 processed_data/
 __pycache__/
 .idea/
+.vscode/
 *.log
 tmp_*.txt
 paper/

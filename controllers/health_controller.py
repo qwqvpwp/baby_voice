@@ -14,6 +14,7 @@ def home():
             "/api/info": "GET - 模型信息",
             "/api/predict": "POST - 音频预测 (multipart/form-data)",
             "/api/predict/base64": "POST - Base64 音频预测",
+            "/api/predict/url": "POST - URL音频预测 (云存储临时链接)",
             "/api/secrets": "POST - 设置 API 密钥"
         }
     })

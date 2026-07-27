@@ -3,8 +3,9 @@
 
 App({
   globalData: {
-    // 服务器地址（开发时填写局域网IP）
-    serverUrl: 'http://10.133.18.154:5000',
+    // 微信云托管配置
+    cloudEnv: 'prod-d9g27kn89d2786475',
+    cloudService: 'flask-tgsf',
     // API Key（与服务器配置一致）
     apiKey: 'your-secret-key',
     // 当前选择的模型
@@ -42,12 +43,14 @@ App({
   },
 
   onLaunch() {
+    // 初始化微信云托管
+    wx.cloud.init({
+      env: this.globalData.cloudEnv
+    });
+
     // 从本地存储恢复设置
     const savedModel = wx.getStorageSync('currentModel');
     if (savedModel) this.globalData.currentModel = savedModel;
-
-    const savedUrl = wx.getStorageSync('serverUrl');
-    if (savedUrl) this.globalData.serverUrl = savedUrl;
   },
 
   // 获取标签中文名

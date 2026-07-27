@@ -8,8 +8,7 @@ Page({
   data: {
     currentModel: 'cnn_lstm',
     apiUrl: '',
-    apiKey: '',
-    serverUrl: ''
+    apiKey: ''
   },
 
   onShow() {
@@ -18,12 +17,10 @@ Page({
 
   loadSettings() {
     const model = app.getModel();
-    const serverUrl = app.globalData.serverUrl || 'http://localhost:5000';
     const apiKey = crypto.getApiKey('default');
 
     this.setData({
       currentModel: model,
-      serverUrl: serverUrl,
       apiKey: apiKey
     });
   },
@@ -46,11 +43,6 @@ Page({
     this.setData({ apiUrl: e.detail.value });
   },
 
-  // 服务器地址输入
-  onServerUrlChange(e) {
-    this.setData({ serverUrl: e.detail.value });
-  },
-
   // 保存 API Key
   saveApiKey() {
     const apiKey = this.data.apiKey.trim();
@@ -60,17 +52,5 @@ Page({
     }
     crypto.saveApiKey('default', apiKey);
     wx.showToast({ title: 'API Key 已保存', icon: 'success', duration: 1500 });
-  },
-
-  // 保存服务器地址
-  saveServerUrl() {
-    const url = this.data.serverUrl.trim();
-    if (!url) {
-      wx.showToast({ title: '请输入服务器地址', icon: 'none' });
-      return;
-    }
-    app.globalData.serverUrl = url;
-    wx.setStorageSync('serverUrl', url);
-    wx.showToast({ title: '服务器地址已保存', icon: 'success', duration: 1500 });
   }
 });

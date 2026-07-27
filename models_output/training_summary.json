@@ -1,0 +1,21 @@
+{
+  "models": {
+    "cnn_lstm": {
+      "test_accuracy": 0.3615,
+      "test_accuracy_pct": "36.15%",
+      "file": "cnn_lstm_final.h5",
+      "best_file": "cnn_lstm_best.h5"
+    },
+    "transformer": {
+      "test_accuracy": 0.3923,
+      "test_accuracy_pct": "39.23%",
+      "best_val_accuracy": 0.4462,
+      "file": "transformer_final.h5",
+      "best_file": "transformer_best.h5",
+      "early_stop_epoch": 42
+    }
+  },
+  "best_model": "transformer",
+  "comparison": "Transformer 模型测试准确率略高于 CNN-LSTM (39.23% vs 36.15%)",
+  "note": "准确率受限于训练数据量(606条)，建议增加数据增强提升性能"
+}

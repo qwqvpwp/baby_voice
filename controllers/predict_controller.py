@@ -2,11 +2,12 @@
 """
 预测控制器 - 提供音频情感识别接口
 """
+import requests as http_requests
 from flask import request, jsonify
 from services.predictor import predictor_service
 from services.secret_manager import secrets
 from services.external_api import call_external_api
-from utils.audio_utils import save_audio_file, save_base64_audio, cleanup_temp_file
+from utils.audio_utils import save_audio_file, save_base64_audio, save_url_audio, cleanup_temp_file
 
 
 def predict():
@@ -49,6 +50,32 @@ def predict_base64():
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e), "code": 500}), 500
+    finally:
+        cleanup_temp_file(tmp_path)
+
+
+def predict_url():
+    body = request.get_json()
+    if not body or "audio_url" not in body:
+        return jsonify({"error": "缺少 audio_url 字段", "code": 400}), 400
+
+    audio_url = body["audio_url"]
+    model_name = body.get("model", "cnn_lstm")
+    source = body.get("source", "local")
+
+    tmp_path = save_url_audio(audio_url)
+
+    try:
+        if source == "api":
+            api_url = body.get("api_url", "")
+            api_key = secrets.get("default_api_key", "")
+            result = call_external_api(tmp_path, api_url, api_key)
+        else:
+            result = predictor_service.predict(tmp_path, model_name)
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e) or repr(e), "code": 500}), 500
     finally:
         cleanup_temp_file(tmp_path)
 

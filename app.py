@@ -8,7 +8,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from controllers.health_controller import home, health
-from controllers.predict_controller import predict, predict_base64, info
+from controllers.predict_controller import predict, predict_base64, predict_url, info
 from controllers.secret_controller import set_secret, delete_secret
 
 app = Flask(__name__)
@@ -19,6 +19,7 @@ app.add_url_rule("/api/health", view_func=health, methods=["GET"])
 app.add_url_rule("/api/info", view_func=info, methods=["GET"])
 app.add_url_rule("/api/predict", view_func=predict, methods=["POST"])
 app.add_url_rule("/api/predict/base64", view_func=predict_base64, methods=["POST"])
+app.add_url_rule("/api/predict/url", view_func=predict_url, methods=["POST"])
 app.add_url_rule("/api/secrets", view_func=set_secret, methods=["POST"])
 app.add_url_rule("/api/secrets/<key>", view_func=delete_secret, methods=["DELETE"])
 
