@@ -1,5 +1,6 @@
 // 微信小程序 - 婴儿情绪识别
 // 全局应用逻辑
+const i18n = require('./utils/i18n');
 
 App({
   globalData: {
@@ -9,40 +10,13 @@ App({
     // API Key（与服务器配置一致）
     apiKey: 'your-secret-key',
     // 当前选择的模型
-    currentModel: 'cnn_lstm',
-    // 标签映射
-    labels: {
-      "awake": "醒了",
-      "diaper": "换尿布",
-      "hug": "要抱抱",
-      "hungry": "饿了",
-      "silence": "安静",
-      "sleepy": "困了",
-      "uncomfortable": "不舒服"
-    },
-    // 情绪对应的建议
-    suggestions: {
-      "hug": "宝宝可能需要安抚，可以抱一抱、轻拍背部",
-      "hungry": "宝宝可能饿了，建议喂奶或辅食",
-      "sleepy": "宝宝困了，可以哄睡、播放摇篮曲",
-      "awake": "宝宝醒了，可以陪宝宝玩耍",
-      "diaper": "宝宝可能需要换尿布了",
-      "uncomfortable": "宝宝可能不舒服，检查衣物是否合适",
-      "silence": "宝宝很安静，一切正常"
-    },
-    // 情绪对应的图标
-    emoji: {
-      "hug": "🤗",
-      "hungry": "🍼",
-      "sleepy": "😴",
-      "awake": "👀",
-      "diaper": "🧷",
-      "uncomfortable": "😣",
-      "silence": "😊"
-    }
+    currentModel: 'cnn_lstm'
   },
 
   onLaunch() {
+    // 初始化多语言（从本地存储恢复）
+    i18n.init();
+
     // 初始化微信云托管
     wx.cloud.init({
       env: this.globalData.cloudEnv
@@ -51,21 +25,33 @@ App({
     // 从本地存储恢复设置
     const savedModel = wx.getStorageSync('currentModel');
     if (savedModel) this.globalData.currentModel = savedModel;
+
+    // 应用语言到 tabBar
+    i18n.applyTabBarText();
   },
 
-  // 获取标签中文名
+  // 获取情绪标签文案（按当前语言）
   getLabelCN(en) {
-    return this.globalData.labels[en] || en;
+    return i18n.tEmotion(en);
   },
 
-  // 获取建议
+  // 获取建议文案（按当前语言）
   getSuggestion(en) {
-    return this.globalData.suggestions[en] || '';
+    return i18n.tSuggestion(en);
   },
 
-  // 获取表情
+  // 获取表情（emoji 与语言无关，保持原映射）
   getEmoji(en) {
-    return this.globalData.emoji[en] || '❓';
+    const emojiMap = {
+      "hug": "🤗",
+      "hungry": "🍼",
+      "sleepy": "😴",
+      "awake": "👀",
+      "diaper": "🧷",
+      "uncomfortable": "😣",
+      "silence": "😊"
+    };
+    return emojiMap[en] || '❓';
   },
 
   // 切换模型
@@ -77,5 +63,19 @@ App({
   // 获取当前模型
   getModel() {
     return this.globalData.currentModel;
-  }
+  },
+
+  // 切换语言
+  setLocale(locale) {
+    const changed = i18n.setLocale(locale, true);
+    return changed;
+  },
+
+  // 获取当前语言
+  getLocale() {
+    return i18n.getLocale();
+  },
+
+  // 暴露 i18n 模块给页面直接使用
+  i18n
 });

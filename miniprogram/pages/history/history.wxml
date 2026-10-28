@@ -1,15 +1,15 @@
 <!-- 历史记录页面 -->
 <view class="container">
   <view class="card" style="display: flex; justify-content: space-between; align-items: center;">
-    <text style="font-size: 32rpx; font-weight: 600; color: #333;">识别历史</text>
-    <text wx:if="{{history.length > 0}}" class="history-del" bindtap="clearAll">清空全部</text>
+    <text style="font-size: 32rpx; font-weight: 600; color: #333;">{{t.history_title}}</text>
+    <text wx:if="{{history.length > 0}}" class="history-del" bindtap="clearAll">{{t.history_clear_all}}</text>
   </view>
 
   <!-- 无记录 -->
   <view wx:if="{{history.length === 0}}" class="card" style="text-align: center; padding: 80rpx 0;">
     <text style="font-size: 80rpx; display: block;">📋</text>
-    <text style="color: #CCC; font-size: 28rpx; display: block; margin-top: 20rpx;">暂无识别记录</text>
-    <text style="color: #DDD; font-size: 24rpx; display: block; margin-top: 8rpx;">去首页录制宝宝声音吧</text>
+    <text style="color: #CCC; font-size: 28rpx; display: block; margin-top: 20rpx;">{{t.history_empty}}</text>
+    <text style="color: #DDD; font-size: 24rpx; display: block; margin-top: 8rpx;">{{t.history_empty_tip}}</text>
   </view>
 
   <!-- 历史列表 -->
@@ -19,13 +19,13 @@
     </view>
     <view class="history-info">
       <text class="history-emotion">{{item.emo_cn}}</text>
-      <text class="history-time">{{formatTime(item.timestamp)}}</text>
+      <text class="history-time">{{item.timeText}}</text>
     </view>
     <view style="text-align: right;">
       <text class="history-conf">{{item.confPercent}}%</text>
       <view style="display: flex; align-items: center; margin-top: 6rpx;">
         <text style="font-size: 20rpx; color: #BBB;">{{item.model_used}}</text>
-        <text class="history-del" style="margin-left: 16rpx;" bindtap="deleteOne" data-id="{{item.id}}">删除</text>
+        <text class="history-del" style="margin-left: 16rpx;" bindtap="deleteOne" data-id="{{item.id}}">{{t.history_delete}}</text>
       </view>
     </view>
   </view>

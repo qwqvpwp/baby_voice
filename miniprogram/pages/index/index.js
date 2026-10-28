@@ -4,6 +4,7 @@
 const app = getApp();
 const api = require('../../utils/api');
 const storage = require('../../utils/storage');
+const i18n = require('../../utils/i18n');
 
 // 录音管理器
 const recorderManager = wx.getRecorderManager();
@@ -22,10 +23,16 @@ Page({
     resultConfidence: 0,
     suggestion: '',
     modelLabel: '',
-    errorMsg: ''
+    errorMsg: '',
+    // 多语言文案
+    t: {},
+    locale: 'zh'
   },
 
   onLoad() {
+    // 注入多语言字典
+    i18n.tPage(this);
+
     // 监听录音结束
     recorderManager.onStop((res) => {
       this.setData({
@@ -39,11 +46,11 @@ Page({
 
       // 验证录音
       if (!res.tempFilePath) {
-        this.setData({ errorMsg: '录音文件无效' });
+        this.setData({ errorMsg: i18n.t('err_invalid_file') });
         return;
       }
       if (res.duration < 500) {
-        this.setData({ errorMsg: '录音时间太短，请录制 1 秒以上' });
+        this.setData({ errorMsg: i18n.t('err_too_short') });
         return;
       }
 
@@ -57,7 +64,7 @@ Page({
           that.analyzeRecording(fileRes.data);
         },
         fail(err) {
-          that.setData({ errorMsg: '读取录音失败: ' + (err.errMsg || '未知错误') });
+          that.setData({ errorMsg: i18n.t('err_read_file') + ': ' + (err.errMsg || '') });
         }
       });
     });
@@ -69,20 +76,19 @@ Page({
       }
       this.setData({
         isRecording: false,
-        errorMsg: '录音失败：' + (err.errMsg || '请授权麦克风权限')
+        errorMsg: i18n.t('err_record_failed') + '：' + (err.errMsg || i18n.t('err_mic_permission'))
       });
     });
   },
 
   onShow() {
+    // 同步导航栏标题
+    i18n.applyNavTitle();
+    // 同步语言字典（语言可能在设置页被切换）
+    i18n.tPage(this);
     // 更新模型标签
     const model = app.getModel();
-    const modelLabels = {
-      'cnn_lstm': 'CNN-LSTM 模型',
-      'transformer': 'Transformer 模型',
-      'api': '外部API'
-    };
-    this.setData({ modelLabel: modelLabels[model] || model });
+    this.setData({ modelLabel: i18n.tModel(model) });
   },
 
   // 切换录音状态
@@ -158,7 +164,7 @@ Page({
       },
       fail(err) {
         if (err.errMsg && err.errMsg.indexOf('cancel') === -1) {
-          that.setData({ errorMsg: '选择文件失败' });
+          that.setData({ errorMsg: i18n.t('err_choose_file') });
         }
       }
     });
@@ -200,7 +206,7 @@ Page({
       that.processResult(res, model);
     }).catch(err => {
       that.setData({
-        errorMsg: err.message || '识别失败',
+        errorMsg: err.message || i18n.t('err_predict_failed'),
         isAnalyzing: false
       });
     });
@@ -221,7 +227,7 @@ Page({
       that.processResult(res, model);
     }).catch(err => {
       that.setData({
-        errorMsg: err.message || '识别失败',
+        errorMsg: err.message || i18n.t('err_predict_failed'),
         isAnalyzing: false
       });
     });
@@ -229,12 +235,12 @@ Page({
 
   // 处理预测结果（recording 和 file upload 共用）
   processResult(res, model) {
-    const resultEmotion = this.getLabelCN(res.emotion);
+    const resultEmotion = app.getLabelCN(res.emotion);
     const resultEmoji = app.getEmoji(res.emotion);
     const resultConfidence = (res.confidence * 100).toFixed(1);
     const suggestion = app.getSuggestion(res.emotion);
 
-    // 处理概率列表 - 添加中文名、是否为最高概率、进度条颜色
+    // 处理概率列表 - 添加本地化名、是否为最高概率、进度条颜色
     const maxProb = Math.max(...(res.probabilities || []).map(p => p.probability));
     const probabilities = (res.probabilities || []).map(p => {
       const isMax = p.probability === maxProb && maxProb > 0;
@@ -247,12 +253,6 @@ Page({
         probPercent: (p.probability * 100).toFixed(1)
       };
     });
-
-    const modelLabels = {
-      'cnn_lstm': 'CNN-LSTM 模型',
-      'transformer': 'Transformer 模型',
-      'api': '外部API'
-    };
 
     const resultData = {
       emotion: res.emotion,
@@ -269,7 +269,7 @@ Page({
       resultEmoji: resultEmoji,
       resultConfidence: resultConfidence,
       suggestion: suggestion,
-      modelLabel: modelLabels[res.model_used || model] || res.model_used,
+      modelLabel: i18n.tModel(res.model_used || model),
       isAnalyzing: false
     });
 

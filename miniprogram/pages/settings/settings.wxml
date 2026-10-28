@@ -1,41 +1,71 @@
 <!-- 设置页面 -->
 <view class="container">
-  <!-- 模型选择 -->
+  <!-- 语言选择 -->
   <view class="card">
-    <text class="section-title">模型选择</text>
-    <text class="section-desc">选择用于语音识别的模型</text>
+    <text class="section-title">{{t.settings_language}}</text>
+    <text class="section-desc">{{t.settings_language_desc}}</text>
 
     <view class="model-list">
-      <view class="model-item {{currentModel === 'cnn_lstm' ? 'active' : ''}}" 
+      <view class="model-item {{locale === 'zh' ? 'active' : ''}}"
+            bindtap="switchLanguage" data-locale="zh">
+        <view class="model-radio">
+          <view wx:if="{{locale === 'zh'}}" class="radio-dot"></view>
+        </view>
+        <view class="model-content">
+          <text class="model-name">{{t.language_zh}}</text>
+          <text class="model-desc">简体中文</text>
+        </view>
+      </view>
+
+      <view class="model-item {{locale === 'en' ? 'active' : ''}}"
+            bindtap="switchLanguage" data-locale="en">
+        <view class="model-radio">
+          <view wx:if="{{locale === 'en'}}" class="radio-dot"></view>
+        </view>
+        <view class="model-content">
+          <text class="model-name">{{t.language_en}}</text>
+          <text class="model-desc">English</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模型选择 -->
+  <view class="card">
+    <text class="section-title">{{t.settings_model}}</text>
+    <text class="section-desc">{{t.settings_model_desc}}</text>
+
+    <view class="model-list">
+      <view class="model-item {{currentModel === 'cnn_lstm' ? 'active' : ''}}"
             bindtap="switchModel" data-model="cnn_lstm">
         <view class="model-radio">
           <view wx:if="{{currentModel === 'cnn_lstm'}}" class="radio-dot"></view>
         </view>
         <view class="model-content">
-          <text class="model-name">CNN-LSTM 混合模型</text>
-          <text class="model-desc">卷积 + 时序网络，适合实时推理</text>
+          <text class="model-name">{{t.settings_model_cnn_lstm}}</text>
+          <text class="model-desc">{{t.settings_model_cnn_lstm_desc}}</text>
         </view>
       </view>
 
-      <view class="model-item {{currentModel === 'transformer' ? 'active' : ''}}" 
+      <view class="model-item {{currentModel === 'transformer' ? 'active' : ''}}"
             bindtap="switchModel" data-model="transformer">
         <view class="model-radio">
           <view wx:if="{{currentModel === 'transformer'}}" class="radio-dot"></view>
         </view>
         <view class="model-content">
-          <text class="model-name">Transformer 模型</text>
-          <text class="model-desc">自注意力机制，精度更高</text>
+          <text class="model-name">{{t.settings_model_transformer}}</text>
+          <text class="model-desc">{{t.settings_model_transformer_desc}}</text>
         </view>
       </view>
 
-      <view class="model-item {{currentModel === 'api' ? 'active' : ''}}" 
+      <view class="model-item {{currentModel === 'api' ? 'active' : ''}}"
             bindtap="switchModel" data-model="api">
         <view class="model-radio">
           <view wx:if="{{currentModel === 'api'}}" class="radio-dot"></view>
         </view>
         <view class="model-content">
-          <text class="model-name">外部 API</text>
-          <text class="model-desc">调用第三方语音识别服务</text>
+          <text class="model-name">{{t.settings_model_api}}</text>
+          <text class="model-desc">{{t.settings_model_api_desc}}</text>
         </view>
       </view>
     </view>
@@ -43,40 +73,40 @@
 
   <!-- API 配置（仅在选择 api 时显示） -->
   <view wx:if="{{currentModel === 'api'}}" class="card">
-    <text class="section-title">API 配置</text>
+    <text class="section-title">{{t.settings_api_config}}</text>
     <view class="api-config">
-      <text class="config-label">API 地址</text>
-      <input class="config-input" placeholder="https://api.example.com/predict" 
+      <text class="config-label">{{t.settings_api_url}}</text>
+      <input class="config-input" placeholder="{{t.settings_api_url_placeholder}}"
              value="{{apiUrl}}" bindinput="onApiUrlChange"/>
-      
-      <text class="config-label">API Key</text>
+
+      <text class="config-label">{{t.settings_api_key}}</text>
       <view class="key-row">
-        <input class="config-input" style="flex: 1;" 
-               placeholder="输入 API Key" password="true"
+        <input class="config-input" style="flex: 1;"
+               placeholder="{{t.settings_api_key_placeholder}}" password="true"
                value="{{apiKey}}" bindinput="onApiKeyChange"/>
-        <button class="btn-small" bindtap="saveApiKey" size="mini">保存</button>
+        <button class="btn-small" bindtap="saveApiKey" size="mini">{{t.settings_save}}</button>
       </view>
-      <text class="key-hint">API Key 加密存储于本地，仅本小程序可用</text>
+      <text class="key-hint">{{t.settings_api_key_hint}}</text>
     </view>
   </view>
 
   <!-- 服务器设置 -->
   <view class="card">
-    <text class="section-title">服务器设置</text>
+    <text class="section-title">{{t.settings_server}}</text>
     <view class="about-info">
-      <text class="about-item">连接方式：微信云托管（内网安全访问）</text>
-      <text class="about-item">无需配置服务器地址，自动内网通信</text>
+      <text class="about-item">{{t.settings_server_connection}}</text>
+      <text class="about-item">{{t.settings_server_note}}</text>
     </view>
   </view>
 
   <!-- 关于 -->
   <view class="card">
-    <text class="section-title">关于</text>
+    <text class="section-title">{{t.settings_about}}</text>
     <view class="about-info">
-      <text class="about-item">版本：1.0.0</text>
-      <text class="about-item">用途：婴儿哭声情绪识别</text>
-      <text class="about-item">类别：醒了 / 换尿布 / 要抱抱 / 饿了 / 安静 / 困了 / 不舒服</text>
-      <text class="about-item">模型：CNN-LSTM / Transformer</text>
+      <text class="about-item">{{t.about_version}}</text>
+      <text class="about-item">{{t.about_purpose}}</text>
+      <text class="about-item">{{t.about_categories}}</text>
+      <text class="about-item">{{t.about_models}}</text>
     </view>
   </view>
 </view>

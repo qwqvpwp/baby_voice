@@ -1,0 +1,2 @@
+| "切换 Steam 账号 xxx" | watt-toolkit-launcher（`-clt steam -account`） |
+| "Steam++ 装哪了 / 找一下 Watt Toolkit 路径" | steam-plus-plus-locator |
